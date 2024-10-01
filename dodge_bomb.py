@@ -2,7 +2,7 @@ import os
 import random
 import sys
 import pygame as pg
-import time  # 追加
+import time
 
 # ゲーム画面の幅と高さを定義
 WIDTH, HEIGHT = 1100, 650
@@ -31,7 +31,7 @@ def check_bound(obj_rct: pg.Rect) -> tuple[bool, bool]:
         tate = False
     return yoko, tate
 
-def game_over(screen):
+def game_over(screen: pg.Surface):
     """
     ゲームオーバー時に画面をブラックアウトし、「Game Over」を表示する関数。
     画面全体を黒くし、泣いているこうかとんの画像と「Game Over」の文字を5秒間表示する。
@@ -65,15 +65,31 @@ def game_over(screen):
 
     pg.display.update()  # 画面更新
     time.sleep(5)  # 5秒間表示
-    print("Game_over")
+    print("Game_over")  # ターミナルに表示
+
+def create_image_dict(kk_img: pg.Surface)-> dict:
+    """
+    こうかとんの画像を移動方向に応じて二倍になって回転させた辞書を返す関数。
+    移動量の合計値タプルをキーに、rotozoomで回転させたSurfaceを値とした辞書を作成。
+    """
+    image_dict = {
+        #  画像rotozoom
+        (5, 0): pg.transform.rotozoom(kk_img, -90, 1.0),   # 右
+        (5, -5): pg.transform.rotozoom(kk_img, -45, 1.0),  # 右上
+        (0, -5): pg.transform.rotozoom(kk_img, 0, 1.0),    # 上
+        (-5, -5): pg.transform.rotozoom(kk_img, 45, 1.0),  # 左上
+        (-5, 0): pg.transform.rotozoom(kk_img, 90, 1.0),   # 左
+        (-5, 5): pg.transform.rotozoom(kk_img, 135, 1.0),  # 左下
+        (0, 5): pg.transform.rotozoom(kk_img, 180, 1.0),   # 下
+        (5, 5): pg.transform.rotozoom(kk_img, -135, 1.0),  # 右下
+    }
+    return image_dict
 
 def main():
-    pg.display.set_caption("逃げろ！こうかとん")  # ゲームウィンドウのタイトル
-    screen = pg.display.set_mode((WIDTH, HEIGHT))  # ゲームウィンドウのサイズ
-    bg_img = pg.image.load("fig/pg_bg.jpg")  # 背景画像
-    kk_img = pg.transform.rotozoom(pg.image.load("fig/3.png"), 0, 0.9)  # こうかとん画像
-    kk_img_cry = pg.transform.rotozoom(pg.image.load("fig/8.png"), 0, 0.9)  # 泣いているこうかとん画像
-
+    pg.display.set_caption("逃げろ！こうかとん")
+    screen = pg.display.set_mode((WIDTH, HEIGHT))
+    bg_img = pg.image.load("fig/pg_bg.jpg")
+    kk_img = pg.image.load("fig/3.png")  # こうかとん画像
 
     kk_rct = kk_img.get_rect()
     kk_rct.center = 300, 200
@@ -81,7 +97,7 @@ def main():
     # 爆弾の設定
     bb_img = pg.Surface((20, 20))  # 爆弾の表面
     bb_img.set_colorkey((0, 0, 0))  # 背景を透過
-    pg.draw.circle(bb_img, (255, 0, 0), (10, 10), 10)  # 爆弾を描画
+    pg.draw.circle(bb_img, (255, 0, 0), (10, 10), 10)
     bb_rct = bb_img.get_rect()
     bb_rct.centerx = random.randint(0, WIDTH)
     bb_rct.centery = random.randint(0, HEIGHT)
@@ -89,6 +105,9 @@ def main():
     vx, vy = +5, +5  # 爆弾の速度
     clock = pg.time.Clock()
     tmr = 0
+
+    # こうかとんの回転画像の辞書を作成
+    kk_img_dict = create_image_dict(kk_img)
 
     while True:
         for event in pg.event.get():
@@ -111,6 +130,12 @@ def main():
                 sum_mv[0] += tpl[0]
                 sum_mv[1] += tpl[1]
 
+        # 移動があった場合、こうかとんの画像を移動方向に応じて変更
+        if sum_mv != [0, 0]:    
+            kk_img_rotated = kk_img_dict.get(tuple(sum_mv))  # 移動量に応じた画像を取得
+        else:
+            kk_img_rotated = kk_img  # 移動がなければ元の画像を使用
+
         kk_rct.move_ip(sum_mv)
 
         # 画面外に出ないように移動を制限
@@ -123,7 +148,7 @@ def main():
         if not tate:
             vy *= -1  # 縦方向の反転
 
-        screen.blit(kk_img, kk_rct)  # こうかとんを描画
+        screen.blit(kk_img_rotated, kk_rct)  # こうかとんを描画
         bb_rct.move_ip(vx, vy)  # 爆弾を移動
         screen.blit(bb_img, bb_rct)  # 爆弾を描画
 
@@ -135,4 +160,4 @@ if __name__ == "__main__":
     pg.init()  # pygameの初期化
     main()
     pg.quit()  # pygameの終了
-    sys.exit()  # プログラムの終了
+    sys.exit()  # プログラム
