@@ -7,6 +7,14 @@ WIDTH, HEIGHT = 1100, 650
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 
+DELTA = {
+            pg.K_UP: (0,-5),
+            pg.K_DOWN: (0,+5),
+            pg.K_LEFT: (-5,0),
+            pg.K_RIGHT: (+5,0),
+        }
+        
+
 def main():
     pg.display.set_caption("逃げろ！こうかとん")
     screen = pg.display.set_mode((WIDTH, HEIGHT))
@@ -24,6 +32,12 @@ def main():
 
         key_lst = pg.key.get_pressed()
         sum_mv = [0, 0]
+
+        for key,tpl in DELTA.items():
+            if key_lst[key]:
+                sum_mv[0] += tpl[0]  # 横方向
+                sum_mv[1] += tpl[1]  # 縦方向
+        
         if key_lst[pg.K_UP]:
             sum_mv[1] -= 5
         if key_lst[pg.K_DOWN]:
