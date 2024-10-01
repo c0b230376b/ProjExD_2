@@ -31,15 +31,17 @@ def check_bound(obj_rct: pg.Rect) -> tuple[bool, bool]:
         tate = False
     return yoko, tate
 
-def game_over(screen, kk_img_cry):
+def game_over(screen):
     """
     ゲームオーバー時に画面をブラックアウトし、「Game Over」を表示する関数。
     画面全体を黒くし、泣いているこうかとんの画像と「Game Over」の文字を5秒間表示する。
     """
+    kk_img_cry = pg.transform.rotozoom(pg.image.load("fig/8.png"), 0, 0.9)  # 泣いているこうかとん画像
+    kk_img_cry2 = pg.transform.flip(kk_img_cry, True, False)
     # 画面全体を半透明の黒で覆う
     black_surface = pg.Surface((WIDTH, HEIGHT))
     black_surface.set_alpha(128)  # 半透明度を設定
-    black_surface.fill((0, 0, 0))  # 黒く塗りつぶす
+    black_surface.fill((100, 0, 0))  # 黒く塗りつぶす
 
     # フォントの設定（サイズ72）
     font = pg.font.Font(None, 72)
@@ -47,18 +49,23 @@ def game_over(screen, kk_img_cry):
 
     # 泣いているこうかとんの位置設定
     kk_rct_cry = kk_img_cry.get_rect()
-    kk_rct_cry.center = WIDTH // 2, HEIGHT // 2
+    kk_rct_cry2 = kk_img_cry.get_rect()
+    
+    kk_rct_cry.center = WIDTH // 2 - 160, HEIGHT // 2
+    kk_rct_cry2.center = WIDTH // 2 + 160, HEIGHT // 2
 
     # テキストの位置設定
-    text_rect = text.get_rect(center=(WIDTH // 2, HEIGHT // 2 + 100))
+    text_rect = text.get_rect(center=(WIDTH // 2, HEIGHT // 2))
 
     # 画面を更新
     screen.blit(black_surface, (0, 0))  # 半透明の黒い四角形を描画
     screen.blit(kk_img_cry, kk_rct_cry)  # 泣いているこうかとんの画像を描画
+    screen.blit(kk_img_cry2, kk_rct_cry2)  # 泣いているこうかとんの画像を描画
     screen.blit(text, text_rect)  # 「Game Over」の文字を描画
 
     pg.display.update()  # 画面更新
     time.sleep(5)  # 5秒間表示
+    print("Game_over")
 
 def main():
     pg.display.set_caption("逃げろ！こうかとん")  # ゲームウィンドウのタイトル
@@ -66,6 +73,7 @@ def main():
     bg_img = pg.image.load("fig/pg_bg.jpg")  # 背景画像
     kk_img = pg.transform.rotozoom(pg.image.load("fig/3.png"), 0, 0.9)  # こうかとん画像
     kk_img_cry = pg.transform.rotozoom(pg.image.load("fig/8.png"), 0, 0.9)  # 泣いているこうかとん画像
+
 
     kk_rct = kk_img.get_rect()
     kk_rct.center = 300, 200
@@ -91,7 +99,7 @@ def main():
 
         # こうかとんが爆弾と衝突した場合
         if kk_rct.colliderect(bb_rct):
-            game_over(screen, kk_img_cry)  # ゲームオーバー画面を表示
+            game_over(screen)  # ゲームオーバー画面を表示
             return
 
         key_lst = pg.key.get_pressed()
