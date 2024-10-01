@@ -18,6 +18,7 @@ DELTA = {
 # 現在のディレクトリを設定（画像ファイル読み込み用）
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
+
 def check_bound(obj_rct: pg.Rect) -> tuple[bool, bool]:
     """
     物体（こうかとんや爆弾）が画面内に収まっているか確認する関数
@@ -35,6 +36,8 @@ def game_over(screen: pg.Surface):
     """
     ゲームオーバー時に画面をブラックアウトし、「Game Over」を表示する関数。
     画面全体を黒くし、泣いているこうかとんの画像と「Game Over」の文字を5秒間表示する。
+    引数：貼り付ける所
+    戻り値はなし
     """
     kk_img_cry = pg.transform.rotozoom(pg.image.load("fig/8.png"), 0, 0.9)  # 泣いているこうかとん画像
     kk_img_cry2 = pg.transform.flip(kk_img_cry, True, False)
@@ -71,6 +74,8 @@ def create_image_dict(kk_img: pg.Surface)-> dict:
     """
     こうかとんの画像を移動方向に応じて二倍になって回転させた辞書を返す関数。
     移動量の合計値タプルをキーに、rotozoomで回転させたSurfaceを値とした辞書を作成。
+    引数：こうかとんの画像
+    戻り値：こうかとんが飛ぶ方向に従ってこうかとん画像の辞書
     """
     image_dict = {
         #  画像rotozoom
